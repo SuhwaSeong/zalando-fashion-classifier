@@ -1,0 +1,11 @@
+Class,Accuracy (%),Correct,Total
+T-shirt/top,88.1,881,1000
+Trouser,98.0,980,1000
+Pullover,80.5,805,1000
+Dress,90.9,909,1000
+Coat,85.4,854,1000
+Sandal,97.5,975,1000
+Shirt,70.1,701,1000
+Sneaker,98.9,989,1000
+Bag,97.8,978,1000
+Ankle boot,91.8,918,1000
