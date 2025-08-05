@@ -9,7 +9,7 @@ from PIL import Image, ImageOps
 import os
 import openai
 
-# 클래스 레이드 정의 / Define class labels
+# 클래스 레이블 정의 / Define class labels
 labels = ["T-shirt/top", "Trouser", "Pullover", "Dress", "Coat",
           "Sandal", "Shirt", "Sneaker", "Bag", "Ankle boot"]
 
@@ -50,7 +50,7 @@ if uploaded_file:
     st.image(bordered_image, caption=f"🎯 예측 / Predicted: {predicted_class}", use_container_width=True)
 
     st.subheader(f"🔍 예측 결과 / Prediction: {predicted_class}")
-    st.write(f"Confidence (신리도): {confidence * 100:.2f}%")
+    st.write(f"Confidence (신뢰도): {confidence * 100:.2f}%")
     fig, ax = plt.subplots()
     ax.barh(labels, prediction)
     ax.set_xlabel("Probability / 예측 확률")
@@ -84,7 +84,7 @@ def plot_confusion_matrix(y_true, y_pred, class_names):
                 xticklabels=class_names, yticklabels=class_names)
     ax.set_xlabel('예측 / Predicted')
     ax.set_ylabel('실제 / Actual')
-    ax.set_title('Confusion Matrix / 호녕 향매')
+    ax.set_title('Confusion Matrix / 혼동 행렬')
     st.pyplot(fig)
 
 def plot_class_accuracy(y_true, y_pred, class_names):
@@ -98,7 +98,7 @@ def plot_class_accuracy(y_true, y_pred, class_names):
 
 st.markdown("---")
 
-if st.checkbox("📊 호녕 향매 및 정확도 보기 / Show Confusion Matrix & Accuracy"):
+if st.checkbox("📊 혼동 행렬 및 정확도 보기 / Show Confusion Matrix & Accuracy"):
     try:
         df = pd.read_csv("fashion_predictions.csv")
         y_true = df["actual"]
@@ -146,7 +146,7 @@ with st.expander("📘 GPT 요약 기능 사용법 / How to Use GPT-based Summar
 [openai]
 api_key = "sk-..."
 ```
-3. 앱을 실행하고 '🧐 GPT 요약 보기' 체크백스를 선택하세요.
+3. 앱을 실행하고 '🧐 GPT 요약 보기' 체크박스를 선택하세요.
 
 ### 🧐 GPT Summary Instructions (English)
 - This feature uses OpenAI GPT-4 to summarize model performance based on prediction results.
@@ -162,4 +162,31 @@ Store it in .streamlit/secrets.toml or in Streamlit Cloud → Settings → Secre
 api_key = "sk-..."
 ```
 3. Check the box "🧐 GPT-based Model Summary" to view the summary.
+""")
+
+# ✅ GPT 요약 실행 / Run GPT-based summary
+if st.checkbox("🧐 GPT 요약 보기 / Show GPT-based Model Summary"):
+    try:
+        df = pd.read_csv("fashion_predictions.csv")
+        if len(df) < 2:
+            st.warning("⚠️ 최소 2개 이상의 예측 결과가 필요합니다 / At least 2 predictions required.")
+        else:
+            prompt = f"""
+You are an expert data analyst. Please summarize the model performance based on the following prediction results:
+
+{df.to_csv(index=False)}
+
+Include insights such as overall accuracy, frequent misclassifications, and class-wise performance.
+"""
+            response = openai.ChatCompletion.create(
+                model="gpt-4",
+                messages=[
+                    {"role": "system", "content": "You are a helpful assistant."},
+                    {"role": "user", "content": prompt}
+                ]
+            )
+            st.subheader("🧠 GPT 요약 결과 / GPT Summary")
+            st.markdown(response.choices[0].message.content)
+    except Exception as e:
+        st.error(f"❌ GPT 요약 실패 / GPT summary failed: {e}")
 """)
