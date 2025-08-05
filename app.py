@@ -189,4 +189,3 @@ Include insights such as overall accuracy, frequent misclassifications, and clas
             st.markdown(response.choices[0].message.content)
     except Exception as e:
         st.error(f"❌ GPT 요약 실패 / GPT summary failed: {e}")
-""")
