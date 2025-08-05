@@ -139,6 +139,9 @@ if st.checkbox("🖼️ 최근 업로드 이미지 보기 / Show Recent Uploads"
     else:
         st.info("⚠️ 업로드된 이미지가 없습니다 / No images found.")
 
+import openai
+openai.api_key = st.secrets["openai"]["api_key"]
+
 # 📘 GPT 사용법 안내 / GPT instructions
 with st.expander("📘 GPT 요약 기능 사용법 / How to Use GPT-based Summary"):
     st.markdown("""
