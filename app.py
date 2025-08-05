@@ -7,7 +7,7 @@ import seaborn as sns
 from sklearn.metrics import confusion_matrix, accuracy_score
 from PIL import Image, ImageOps
 import os
-import openai
+from openai import OpenAI
 
 # 클래스 레이블 정의 / Define class labels
 labels = ["T-shirt/top", "Trouser", "Pullover", "Dress", "Coat",
@@ -129,63 +129,41 @@ if st.checkbox("🖼️ 최근 업로드 이미지 보기 / Show Recent Uploads"
     else:
         st.info("⚠️ 업로드된 이미지가 없습니다 / No images found.")
 
-openai.api_key = st.secrets["openai"]["api_key"]
+client = OpenAI(api_key=st.secrets["openai"]["api_key"])
 
-with st.expander("📘 GPT 요약 기능 사용법 / How to Use GPT-based Summary"):
-    st.markdown("""
-### 🧐 GPT 요약 기능 안내 (Korean)
+def generate_gpt_summary(df):
+    class_counts = df["predicted"].value_counts().to_dict()
+    acc = (df["predicted"] == df["actual"]).mean()
 
-- 이 기능은 OpenAI의 GPT-4를 사용해서 예측 결과를 자동으로 분석해주는 기능입니다.
-- `fashion_predictions.csv` 파일에 최소 2개 이상의 예측 결과가 포함되어야 합니다.
-- GPT를 사용하려면 OpenAI API 키가 필요합니다.
+    prompt = f"""
+You are an AI assistant analyzing fashion image classification results.
+Here is the data summary:
+- Total predictions: {len(df)}
+- Overall accuracy: {acc:.2%}
+- Class distribution: {class_counts}
 
-#### 사용 방법:
-1. [https://platform.openai.com/account/api-keys](https://platform.openai.com/account/api-keys) 에서 API 키를 발급 받으세요.
-2. `secrets.toml` 또는 Streamlit Cloud의 **Secrets Settings**에 아래와 같이 저장하세요:
-```toml
-[openai]
-api_key = "sk-..."
-```
-3. 앱을 실행하고 '🧐 GPT 요약 보기' 체크박스를 선택하세요.
+Please write a short summary (3–5 sentences) in English about the model performance, including which classes perform well or poorly.
+"""
 
-### 🧐 GPT Summary Instructions (English)
-- This feature uses OpenAI GPT-4 to summarize model performance based on prediction results.
-- You must have at least 2 records in fashion_predictions.csv.
-- An OpenAI API key is required.
+    response = client.chat.completions.create(
+        model="gpt-4",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant that explains model performance."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.7,
+        max_tokens=300
+    )
+    return response.choices[0].message.content
 
-How to use:
-Get your key from https://platform.openai.com/account/api-keys
-
-Store it in .streamlit/secrets.toml or in Streamlit Cloud → Settings → Secrets:
-```toml
-[openai]
-api_key = "sk-..."
-```
-3. Check the box "🧐 GPT-based Model Summary" to view the summary.
-""")
-
-# ✅ GPT 요약 실행 / Run GPT-based summary
-if st.checkbox("🧐 GPT 요약 보기 / Show GPT-based Model Summary"):
+if st.checkbox("🧠 GPT 기반 모델 요약 보기 / Show GPT-based Model Summary"):
     try:
         df = pd.read_csv("fashion_predictions.csv")
         if len(df) < 2:
-            st.warning("⚠️ 최소 2개 이상의 예측 결과가 필요합니다 / At least 2 predictions required.")
+            st.warning("❗ 최소 2개의 예측 데이터가 필요합니다 / Need at least 2 records.")
         else:
-            prompt = f"""
-You are an expert data analyst. Please summarize the model performance based on the following prediction results:
-
-{df.to_csv(index=False)}
-
-Include insights such as overall accuracy, frequent misclassifications, and class-wise performance.
-"""
-            response = openai.ChatCompletion.create(
-                model="gpt-4",
-                messages=[
-                    {"role": "system", "content": "You are a helpful assistant."},
-                    {"role": "user", "content": prompt}
-                ]
-            )
-            st.subheader("🧠 GPT 요약 결과 / GPT Summary")
-            st.markdown(response.choices[0].message.content)
+            summary = generate_gpt_summary(df)
+            st.markdown("### 📋 GPT 요약 결과 / GPT Summary Result")
+            st.success(summary)
     except Exception as e:
-        st.error(f"❌ GPT 요약 실패 / GPT summary failed: {e}")
+        st.error(f"❌ 요약 생성 실패 / Failed to generate summary: {e}")
