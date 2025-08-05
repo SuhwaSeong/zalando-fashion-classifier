@@ -29,31 +29,42 @@ This is a bilingual (🇰🇷/🇺🇸) Streamlit web app that classifies Zaland
 
 ---
 
-## 🧠 GPT 요약 기능 사용법 / How to Use GPT Summary
+## 📂 Dataset Source
 
-1. **로컬에서 실행하는 경우에만 OpenAI API 키가 필요합니다.**
-   *(If you run the app locally, you need an API key. If you're using Streamlit Cloud with `Secrets`, skip this step.)*
-
-2. 로컬 실행 시, 프로젝트 루트에 `.streamlit/secrets.toml` 파일을 만들고 아래처럼 작성합니다:
-
-```toml
-[openai]
-api_key = "sk-..."  # 본인의 OpenAI API 키 입력
-```
-
-> 🛑 `.streamlit/secrets.toml` 파일은 **절대 GitHub에 업로드하지 마세요.**
-
-3. Streamlit Cloud에서는 **Settings > Secrets**에 이미 키를 입력한 경우, 추가 설정은 필요하지 않습니다.
-
-4. 앱을 실행하고 `🧠 GPT 기반 모델 요약 보기 / Show GPT-based Model Summary` 체크박스를 선택하면 자동 분석이 실행됩니다.
+* This app uses the [Fashion MNIST dataset](https://github.com/zalandoresearch/fashion-mnist) provided by Zalando Research.
+* It contains 28x28 grayscale images of 10 fashion categories such as T-shirt/top, Trouser, Sneaker, etc.
 
 ---
 
-## 🗃️ Original Dataset
+## 🧠 Model Training Info
 
-* **Fashion MNIST**: [https://github.com/zalandoresearch/fashion-mnist](https://github.com/zalandoresearch/fashion-mnist)
-  Zalando에서 제공한 흑백 28x28 픽셀 패션 이미지 데이터셋
-  (10개 카테고리: T-shirt/top, Trouser, Pullover, Dress, Coat, Sandal, Shirt, Sneaker, Bag, Ankle boot)
+* The CNN model was trained using TensorFlow/Keras on the Fashion MNIST dataset.
+* Training was performed for 10 epochs with accuracy around 89%.
+* You can optionally retrain the model using a custom script (`train_model.py`, not included by default).
+
+---
+
+## 🧠 GPT 요약 기능 사용법 / How to Use GPT Summary
+
+📌 이 기능은 저장된 예측 결과를 바탕으로 GPT가 모델의 성능을 분석 및 요약해주는 기능입니다.
+📌 This feature uses GPT to summarize your model performance based on saved predictions.
+
+### ✅ 사용 조건 / Requirements:
+
+* 최소 **2개 이상의 예측 결과**가 저장되어 있어야 합니다.
+  At least **2 predictions** must be saved.
+* 예측 후 **"예측 저장" 버튼**을 눌러야 데이터가 기록됩니다.
+  You must click **"Save Prediction"** after prediction to store the result.
+
+### 📤 출력 내용 / Output Includes:
+
+* 전체 예측 수 / Total predictions
+* 정확도 / Overall accuracy
+* 클래스별 예측 분포 / Class-wise prediction distribution
+* GPT가 자동 생성한 요약 (영문) / GPT-generated summary (in English)
+
+> 🔐 GPT 요약은 OpenAI API를 통해 실행됩니다.
+> *GPT summary is powered by OpenAI API. Ensure your API key is configured properly in Streamlit Secrets.*
 
 ---
 
@@ -68,28 +79,28 @@ streamlit run app.py
 
 ## 📁 Files
 
-| 파일                        | 설명                                                 |
-| ------------------------- | -------------------------------------------------- |
-| `app.py`                  | 메인 앱 파일 / Main Streamlit app                       |
-| `cnn_fashion_model.keras` | 학습된 CNN 모델 / Trained CNN model                     |
-| `.gitignore`              | 민감한 파일 제외 설정 / Git ignore rules                    |
-| `requirements.txt`        | 설치 패키지 목록 / Python dependencies                    |
-| `.streamlit/secrets.toml` | OpenAI 키 설정 (로컬용) / OpenAI API key (for local use) |
-| `README.md`               | 프로젝트 설명 문서 / This file                             |
+| 파일                        | 설명                              |
+| ------------------------- | ------------------------------- |
+| `app.py`                  | 메인 앱 파일 / Main Streamlit app    |
+| `cnn_fashion_model.keras` | 학습된 CNN 모델 / Trained CNN model  |
+| `.gitignore`              | 민감한 파일 제외 설정 / Git ignore rules |
+| `requirements.txt`        | 설치 패키지 목록 / Python dependencies |
+| `.streamlit/secrets.toml` | OpenAI 키 설정 / OpenAI API key    |
+| `README.md`               | 프로젝트 설명 문서 / This file          |
 
 ---
 
 ## 📦 Deployment (Streamlit Cloud)
 
-* Streamlit Cloud에서 앱을 업로드하고 **Settings → Secrets**에서 API 키를 입력하세요.
-* 무료로 배포할 수 있습니다: [https://streamlit.io/cloud](https://streamlit.io/cloud)
+* Streamlit Cloud에 업로드하고, `.streamlit/secrets.toml` 또는 Secrets 설정에서 OpenAI API 키를 등록하세요.
+* You can deploy for free at [https://streamlit.io/cloud](https://streamlit.io/cloud)
 
 ---
 
 ## 🙋‍♀️ Author
 
-**Suhwa Seong**
-M.Sc. Data Science Student, UE Germany
+**Suhwa Seong**  
+M.Sc. Data Science Student, UE Germany  
 GitHub: [https://github.com/SuhwaSeong](https://github.com/SuhwaSeong)
 
 ```
