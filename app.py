@@ -154,3 +154,4 @@ with st.expander("📘 GPT 요약 기능 사용법 / How to Use GPT-based Summar
 ```toml
 [openai]
 api_key = "sk-..."
+""")
