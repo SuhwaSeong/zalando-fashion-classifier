@@ -154,4 +154,18 @@ with st.expander("📘 GPT 요약 기능 사용법 / How to Use GPT-based Summar
 ```toml
 [openai]
 api_key = "sk-..."
+3. 앱을 실행하고 '🧠 GPT 요약 보기' 체크박스를 선택하세요.
+
+### 🧠 GPT Summary Instructions (English)
+- This feature uses OpenAI GPT-4 to summarize model performance based on prediction results.
+- You must have at least 2 records in fashion_predictions.csv.
+- An OpenAI API key is required.
+How to use:
+Get your key from https://platform.openai.com/account/api-keys
+
+Store it in .streamlit/secrets.toml or in Streamlit Cloud → Settings → Secrets:
+[openai]
+api_key = "sk-..."
+3. Check the box "🧠 GPT-based Model Summary" to view the summary.
+
 """)
