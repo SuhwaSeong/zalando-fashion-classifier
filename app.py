@@ -62,8 +62,8 @@ if uploaded_file:
         csv_path = "fashion_predictions.csv"
         new_data = pd.DataFrame([{
             "filename": uploaded_file.name,
-            "predicted": predicted_class,
-            "actual": actual_label
+            "Predicted Label": predicted_class,
+            "True Label": actual_label
         }])
         if os.path.exists(csv_path):
             existing = pd.read_csv(csv_path)
@@ -101,8 +101,8 @@ st.markdown("---")
 if st.checkbox("📊 혼동 행렬 및 정확도 보기 / Show Confusion Matrix & Accuracy"):
     try:
         df = pd.read_csv("fashion_predictions.csv")
-        y_true = df["actual"]
-        y_pred = df["predicted"]
+        y_true = df["True Label"]
+        y_pred = df["Predicted Label"]
         col1, col2 = st.columns(2)
         with col1:
             plot_confusion_matrix(y_true, y_pred, labels)
@@ -132,8 +132,8 @@ if st.checkbox("🖼️ 최근 업로드 이미지 보기 / Show Recent Uploads"
 client = OpenAI(api_key=st.secrets["openai"]["api_key"])
 
 def generate_gpt_summary(df):
-    class_counts = df["predicted"].value_counts().to_dict()
-    acc = (df["predicted"] == df["actual"]).mean()
+    class_counts = df["Predicted Label"].value_counts().to_dict()
+    acc = (df["Predicted Label"] == df["True Label"]).mean()
 
     prompt = f"""
 You are an AI assistant analyzing fashion image classification results.
@@ -167,3 +167,28 @@ if st.checkbox("🧠 GPT 기반 모델 요약 보기 / Show GPT-based Model Summ
             st.success(summary)
     except Exception as e:
         st.error(f"❌ 요약 생성 실패 / Failed to generate summary: {e}")
+st.markdown("""
+---
+### 🧠 GPT 요약 기능 안내 / GPT Summary Guide
+
+📌 이 기능은 저장된 예측 결과를 바탕으로 GPT가 모델의 성능을 분석 및 요약해주는 기능입니다.  
+📌 This feature uses GPT to summarize your model performance based on saved predictions.
+
+#### ✅ 사용 조건 / Requirements:
+- 최소 **2개 이상의 예측 결과**가 저장되어 있어야 합니다.  
+  At least **2 predictions** must be saved.
+- 예측 후 **"예측 저장" 버튼**을 눌러야 데이터가 기록됩니다.  
+  You must click **"Save Prediction"** after prediction to store the result.
+
+#### 📤 출력 내용 / Output Includes:
+- 전체 예측 수 / Total predictions
+- 정확도 / Overall accuracy
+- 클래스별 예측 분포 / Class-wise prediction distribution
+- GPT가 자동 생성한 요약 (영문) / GPT-generated summary (in English)
+
+> 🔐 GPT 요약은 OpenAI API를 통해 실행됩니다.  
+> *GPT summary is powered by OpenAI API. Ensure your API key is configured properly.*
+
+---
+""")
+
