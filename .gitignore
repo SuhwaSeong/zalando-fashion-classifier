@@ -1,0 +1,33 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Jupyter notebooks
+.ipynb_checkpoints
+
+# Streamlit secrets
+.streamlit/secrets.toml
+
+# Environment files
+.env
+*.env
+
+# OS generated
+.DS_Store
+Thumbs.db
+
+# Model and data files
+*.h5
+*.keras
+*.pkl
+*.csv
+recent_uploads/
+fashion_predictions.csv
+
+# VSCode and PyCharm project files
+.vscode/
+.idea/
+
+# Misc
+*.log
