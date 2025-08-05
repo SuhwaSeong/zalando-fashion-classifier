@@ -10,25 +10,25 @@ from PIL import Image, ImageOps
 import os
 import random
 
-# 펠리지 레이블 정의
+# 🏷️ Define class labels
 labels = ["T-shirt/top", "Trouser", "Pullover", "Dress", "Coat",
           "Sandal", "Shirt", "Sneaker", "Bag", "Ankle boot"]
 
-# 모델 로딩
+# 🎯 Load CNN model
 @st.cache_resource
 def load_model():
     return tf.keras.models.load_model("cnn_fashion_model.keras")
 
 model = load_model()
 
-# 테두리 색상 매협
+# 🎨 Border color mapping
 border_colors = {
     "T-shirt/top": "gray", "Trouser": "olive", "Pullover": "purple",
     "Dress": "pink", "Coat": "brown", "Sandal": "orange",
     "Shirt": "teal", "Sneaker": "blue", "Bag": "green", "Ankle boot": "red"
 }
 
-# 앱 시작
+# 📌 Start Streamlit App
 st.title("👚 Zalando Fashion Classifier")
 st.write("Upload a fashion image to predict its category.")
 
@@ -42,14 +42,17 @@ if uploaded_file:
     img_array = np.array(image) / 255.0
     img_array = img_array.reshape(1, 28, 28, 1)
 
+    # 🔮 Run prediction
     prediction = model.predict(img_array)[0]
     predicted_class = labels[np.argmax(prediction)]
     confidence = np.max(prediction)
 
+    # 🎨 Draw border color
     color = border_colors.get(predicted_class, "black")
     bordered_image = ImageOps.expand(image, border=8, fill=color)
     st.image(bordered_image, caption=f"🎯 Predicted: {predicted_class}", use_column_width=False)
 
+    # 🔢 Show prediction probabilities
     st.subheader(f"🔍 Prediction: {predicted_class}")
     st.write(f"Confidence: {confidence * 100:.2f}%")
     fig, ax = plt.subplots()
@@ -58,10 +61,12 @@ if uploaded_file:
     ax.set_title("Prediction Probabilities")
     st.pyplot(fig)
 
+    # Save image
     recent_path = os.path.join(recent_folder, uploaded_file.name)
     bordered_image.save(recent_path)
-    st.success("📅 Image saved to recent uploads.")
+    st.success("📥 Image saved to recent uploads.")
 
+# 📉 Confusion Matrix
 def plot_confusion_matrix(y_true, y_pred, class_names):
     cm = confusion_matrix(y_true, y_pred, labels=class_names)
     fig, ax = plt.subplots(figsize=(8, 6))
@@ -72,6 +77,7 @@ def plot_confusion_matrix(y_true, y_pred, class_names):
     plt.title('Confusion Matrix')
     st.pyplot(fig)
 
+# 📈 Class-wise Accuracy
 def plot_class_accuracy(y_true, y_pred, class_names):
     df = pd.DataFrame({'true': y_true, 'pred': y_pred})
     class_acc = df.groupby('true').apply(lambda x: accuracy_score(x['true'], x['pred']))
@@ -92,6 +98,7 @@ if st.checkbox("📉 Show Confusion Matrix and Class Accuracy"):
     except Exception as e:
         st.error(f"❌ Error loading prediction file: {e}")
 
+# ⬇️ CSV Download
 if st.checkbox("⬇️ Download Prediction CSV"):
     try:
         df = pd.read_csv("fashion_predictions.csv")
@@ -100,6 +107,7 @@ if st.checkbox("⬇️ Download Prediction CSV"):
     except:
         st.warning("No prediction CSV found.")
 
+# 🖼️ Gallery of Recently Uploaded Images
 if st.checkbox("🖼️ Show Recently Uploaded Images"):
     files = os.listdir(recent_folder)
     if files:
@@ -110,12 +118,12 @@ if st.checkbox("🖼️ Show Recently Uploaded Images"):
     else:
         st.info("No images found in recent uploads.")
 
+# 🧠 GPT-based Summary
 if st.checkbox("🧠 GPT-based Model Summary"):
     try:
         import openai
-        openai_key = st.text_input("🔑 Enter your OpenAI API key", type="password")
-        if openai_key:
-            openai.api_key = openai_key
+        openai.api_key = st.text_input("🔑 Enter your OpenAI API key", type="password")
+        if openai.api_key:
             df = pd.read_csv("fashion_predictions.csv")
             summary = df.groupby(['actual', 'predicted']).size().reset_index(name='count')
             prompt = f"Summarize this model performance:\n\n{summary.to_string(index=False)}"
